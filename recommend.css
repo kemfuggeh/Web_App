@@ -1,0 +1,45 @@
+body {
+    background-image: url('/static/rec.jpeg');
+    background-size: cover;
+    
+    margin: 0;
+    padding: 0;
+    
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+        h2 {
+            color: #02ff02; /* Teal text color */
+            text-align: center;
+        }
+        p {
+            margin-bottom: 5px;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+            margin-top: 5px;
+            margin-bottom: 15px;
+        }
+        li {
+            margin-bottom: 5px;
+        }
+        div {
+            background-color: #FFFACD;
+            padding: 10px;
+            margin-bottom: 20px;
+        }
+        button {
+            padding: 10px 20px; /* Adjust padding to make it medium-sized */
+            background-color: #4267B2; /* Facebook's button color */
+            color: white; /* Text color */
+            border: none; /* Remove border */
+            border-radius: 5px; /* Add border-radius for rounded corners */
+            cursor: pointer;
+          }
+        
+          /* Center the button */
+          .center {
+            text-align: center;
+          }
