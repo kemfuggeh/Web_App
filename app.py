@@ -1,11 +1,24 @@
 from flask import Flask, render_template, request, session
 import pandas as pd
+import os
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'  # Set a secret key for session security
 
 # Load dorm data from Excel file
 dorms_df = pd.read_excel('dorms_data.xlsx')
+
+# Path to the historical ratings CSV file
+historical_ratings_path = 'C:/Users/K/Desktop/Dormitory/historical_ratings.csv'
+
+# Check if the historical ratings file exists
+if os.path.exists(historical_ratings_path):
+    # Load historical ratings from the CSV file
+    historical_ratings_df = pd.read_csv(historical_ratings_path, index_col='User')
+    historical_ratings = historical_ratings_df.to_dict(orient='index')
+else:
+    # If the file doesn't exist, create an empty dictionary
+    historical_ratings = {}
 
 def is_valid_budget(budget):
     return 500 <= budget <= 999999  # Adjust the range as needed
@@ -15,12 +28,11 @@ def calculate_similarity(user_preferences, dorm):
     distance = sum((user_preferences[feature] - dorm[feature])**2
                    for feature in user_preferences
                    if feature in dorm and isinstance(user_preferences[feature], (int, float)) and isinstance(dorm[feature], (int, float)))
-    
-    # Include historical ratings in the similarity calculation
-    if 'ratings' in user_preferences and 'ratings' in dorm:
-        for dorm_name, rating in user_preferences['ratings'].items():
-            if dorm_name in dorm['ratings']:
-                distance += (rating - dorm['ratings'][dorm_name])**2
+
+    # Collaborative filtering part - incorporate historical ratings
+    for user, ratings in historical_ratings.items():
+        if user_preferences['budget'] >= dorm['budget'] and dorm['name'] in ratings:
+            distance += (user_preferences['ratings'].get(dorm['name'], 0.0) - ratings[dorm['name']])**2
 
     similarity = 1 / (1 + distance)
     return similarity
@@ -52,7 +64,9 @@ def recommend_dorms(user_preferences, top_n=3):
     user_and_dorms_data.to_excel('C:/Users/K/Desktop/Dormitory/dataset.xlsx', index=False)
 
     return recommended_dorms
-
+@app.route('/homepage.html')
+def homepage():
+    return render_template('homepage.html')
 @app.route('/')
 def index():
     try:
@@ -78,8 +92,16 @@ def get_recommendations():
         'room_size': request.form['room_size'],
         'bathroom': request.form['bathroom'],
         'environment': request.form['environment'],
-        'barangay': request.form.get('barangay', 'N/A')  # Add Barangay to user preferences with a default value of 'N/A'
+        'barangay': request.form.get('barangay', 'N/A'),
+        'near school': request.form.get('near school', 'N/A'),
+        'ratings': {}  # Add an empty dictionary for storing user ratings
     }
+
+    # Extract dorm ratings from the form data
+    for dorm_name in dorms_df['name']:
+        rating = request.form.get(f'rating_{dorm_name}', None)
+        if rating is not None:
+            user_preferences['ratings'][dorm_name] = float(rating)
 
     if not is_valid_budget(user_preferences['budget']):
         return render_template('no_recommendation.html')
