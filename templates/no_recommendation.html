@@ -1,28 +1,56 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>No Recommended Dorm</title>
+    <title>No Recommendation Dorm</title>
+    <link rel="icon" href="{{ url_for('static', filename='logo.ico') }}" type="image/x-icon">
     <style>
         body {
-            background-color: #FFD700; /* Gold background */
             font-family: 'Arial', sans-serif;
+            background-color: #f0f2f5;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 50px auto;
+            background-color: #fff;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #1877f2;
+        }
+
+        p {
+            color: #333;
+        }
+
+        .footer {
+            margin-top: 20px;
+            padding-top: 10px;
+            border-top: 1px solid #ddd;
             text-align: center;
-            margin: 20px;
-        }
-        h2 {
-            color: #8B4513; /* Saddle Brown text color */
-            margin-top: 50px;
-        }
-        img {
-            width: 150px;
-            margin-top: 30px;
+            color: #555;
         }
     </style>
 </head>
+
 <body>
-    <h2>No Recommended Dorm</h2>
-    <img src="https://placekitten.com/150/150" alt="Sad Cat Image">
+    <div class="container">
+        <h1>No Recommended Dorms</h1>
+        <p>Unfortunately, we couldn't find any recommended dorms for you at the moment. Please check back later or contact the housing department for assistance.</p>
+    </div>
+
+    <div class="footer">
+        <p>&copy; 2024 No Recommendation Dorm Page</p>
+    </div>
 </body>
+
 </html>

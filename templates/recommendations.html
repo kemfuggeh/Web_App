@@ -10,78 +10,42 @@
     <link rel="icon" href="{{ url_for('static', filename='logo.ico') }}" type="image/x-icon">
 
     <style>
-        body {
-            background-color: #f0f2f5;
-        }
-
-        .container {
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            text-align: center;
-            margin-top: 50px;
-        }
-
-        h2 {
-            color: #1877f2;
-        }
-
-        form {
-            margin-top: 20px;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 8px;
-            text-align: left;
-            color: #1c1e21;
-        }
-
-        input,
-        select {
-            width: calc(100% - 20px);
-            padding: 10px;
-            margin-bottom: 15px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            box-sizing: border-box;
-        }
-
-        input[type="submit"] {
-            border-radius: 25px;
-            border: 2px solid #1877f2;
-            background: rgba(24, 119, 242, 0.4);
-            color: #fff;
-            padding: 10px 20px;
-            transition: all 400ms ease-out;
-            cursor: pointer;
-        }
-
-        input[type="submit"]:hover {
-            background: #1877f2;
-            color: #fff;
-            border: 2px solid #1877f2;
-        }
-
-        .card {
-            margin-top: 20px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-
-        .card-title {
-            color: #1877f2;
-        }
-
-        .list-group-item {
-            background-color: #fff;
-            color: #1c1e21;
-            border: 1px solid #ddd;
-        }
+      
     </style>
 </head>
 
 <body>
+    
+        {% if recommended_dorms %}
+        <h2 class="mt-4">Recommended Dorms</h2>
+        {% for dorm in recommended_dorms %}
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">{{ dorm['dorm'] }}</h5>
+               <div style="background-color: #02ff02; padding: 5px; display: inline-block; border-radius: 10px;">
+  <p class="card-text">Rating: {{ dorm['rating'] }}</p>
+</div>
+                <p class="card-text">Location: {{ dorm['location'] }}</p>
+                <p class="card-text">Distance from school: {{ dorm['distance'] }} miles</p>
+                <p class="card-text">Number of rides to get there: {{ dorm['rides'] }}</p>
+                <p class="card-text">Details for {{ dorm['dorm'] }}:</p>
+                
+                
+                <ul class="list-group">
+                    {% for key, value in dorm['details'].items() %}
+                        {% if key in ['budget', 'barangay', 'near_school', 'wifi', 'address', 'landmark', 'link'] %}
+                            <li class="list-group-item"><strong>{{ key.capitalize() }}:</strong> {{ value }}</li>
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+        {% endfor %}
+        {% else %}
+        <h2 class="mt-4">No Recommended Dorm</h2>
+        {% endif %}
+    </div>
+
     <div class="container">
         <form action="/get_recommendations" method="post">
             <div class="form-group">
@@ -89,11 +53,14 @@
                 <input type="number" class="form-control" name="budget" required oninput="this.value = Math.abs(this.value)" min="500" max="999999">
             </div>
             <div class="form-group">
-                <label for="location">Location:</label>
-                <select class="form-control" name="location" required>
+                <label for="location" class="form-label">Location</label>
+                <select class="form-control" id="location" name="location" required>
+                    <option value="" disabled selected>Select Location</option>
                     <option value="taguig">Taguig</option>
                     <option value="paranaque">Paranaque</option>
                 </select>
+
+           
             </div>
             <div class="form-group">
                 <label for="room_size">Room Size:</label>
@@ -117,44 +84,61 @@
                 </select>
             </div>
             <div class="form-group">
-                <label for="barangay">Barangay:</label>
-                <select class="form-control" name="barangay" required>
-                    <option value="upper bicutan">Upper Bicutan</option>
-                    <option value="lower bicutan">Lower Bicutan</option>
-                    <option value="western bicutan">Western Bicutan</option>
-                    <option value="don bosco">Don Bosco</option>
+                <label for="barangay" class="form-label">Barangay</label>
+                <select class="form-control" id="barangay" name="barangay" required disabled>
+                    <option value="" disabled selected>Select Barangay</option>
+                </select>
+                    <!-- Options will be dynamically populated using JavaScript -->
                 </select>
             </div>
             <button type="submit" class="btn btn-success">Get Recommendations</button>
         </form>
+        </form>
 
-        {% if recommended_dorms %}
-        <h2 class="mt-4">Recommended Dorms</h2>
-        {% for dorm in recommended_dorms %}
-        <div class="card">
-            <div class="card-body">
-                <h5 class="card-title">{{ dorm['dorm'] }}</h5>
-                <p class="card-text">Rating: {{ dorm['rating'] }}</p>
-                <p class="card-text">Location: {{ dorm['location'] }}</p>
-                <p class="card-text">Distance from school: {{ dorm['distance'] }} miles</p>
-                <p class="card-text">Number of rides to get there: {{ dorm['rides'] }}</p>
-                <p class="card-text">Details for {{ dorm['dorm'] }}:</p>
-                <ul class="list-group">
-                    {% for key, value in dorm['details'].items() %}
-                    <li class="list-group-item"><strong>{{ key.capitalize() }}:</strong> {{ value }}</li>
-                    {% endfor %}
-                </ul>
-            </div>
-        </div>
-        {% endfor %}
-        {% else %}
-        <h2 class="mt-4">No Recommended Dorm</h2>
-        {% endif %}
-    </div>
-
+    
     <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js" integrity="sha384-9aH16kLCCJpOJP1i5Vq-hs7Ct2msaIRScD4EWVYVGwsjT5U4aEHbdckTPrjFJz3" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+    <script>
+        $(document).ready(function() {
+            $('#location').change(function() {
+                var location = $(this).val();
+                var barangays = location === 'taguig' ? ['Bagumbayan', 'Bambang', 'Calzada', 'Central Bicutan', 'Central Signal Village (Signal Village)', 'Fort Bonifacio', 'Hagonoy', 'Ibayo-Tipas', 'Katuparan', 'Ligid-Tipas', 'Lower Bicutan', 'Maharlika Village', 'Napindan', 'New Lower Bicutan', 'North Daang Hari', 'North Signal Village', 'Palingon', 'Pinagsama', 'San Miguel', 'Santa Ana', 'South Daang Hari', 'South Signal Village', 'Tanyag (Bagong Tanyag)', 'Tuktukan', 'Upper Bicutan', 'Ususan', 'Wawa', 'Western Bicutan'] :['Don Bosco', 'Baclaran', 'B. F. Homes', 'Don Galo', 'La Huerta', 'Marcelo Green Village', 'Merville', 'Moonwalk', 'San Antonio', 'San Dionisio', 'San Isidro', 'San Martin De Porres', 'Santo Niño', 'Sun Valley', 'Tambo', 'Vitalez'];
+                var barangaySelect = $('#barangay');
+                barangaySelect.empty().append('<option value="" disabled selected>Select Barangay</option>');
+                $.each(barangays, function(index, value) {
+                    barangaySelect.append($('<option></option>').attr('value', value).text(value));
+                });
+                barangaySelect.prop('disabled', false);
+            });
+
+            $('#dormForm').submit(function(event) {
+                event.preventDefault();
+                var formData = $(this).serializeArray();
+                $.ajax({
+                    type: 'POST',
+                    url: '/get_recommendations',
+                    data: formData,
+                    success: function(response) {
+                        $('#mostRecommendedDorm').html(response.most_recommended_dorm ? response.most_recommended_dorm.name + " - Rating: " + response.most_recommended_dorm.rating : "No most recommended dorm available.");
+                        $('#previousRecommendations').empty();
+                        if (response.dorm_data) {
+                            $.each(response.dorm_data, function(index, data) {
+                                $('#previousRecommendations').append('<p>' + data.dorm + ' - Barangay: ' + data.barangay + '</p>');
+                            });
+                        }
+                        $('#recommendations').show();
+                        $('html, body').animate({
+                            scrollTop: $('#recommendations').offset().top
+                        }, 'slow');
+                    },
+                    error: function(xhr, status, error) {
+                        console.error(xhr.responseText);
+                    }
+                });
+            });
+        });
+    </script>
 </body>
 
 </html>

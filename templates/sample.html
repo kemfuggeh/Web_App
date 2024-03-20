@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Feedback Demo</title>
+</head>
+<body>
+    <div>
+        <h2>Did you find this recommendation helpful?</h2>
+        <button onclick="submitFeedback('thumbs-up')">👍</button>
+        <button onclick="submitFeedback('thumbs-down')">👎</button>
+    </div>
+
+    <script>
+        function submitFeedback(type) {
+            // Create a data object with the feedback type
+            const data = { feedback: type };
+
+            // Send a POST request to the server
+            fetch('/submit-feedback', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to submit feedback');
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Feedback submitted successfully:', data);
+                // Handle success response from the server
+            })
+            .catch(error => {
+                console.error('Error submitting feedback:', error.message);
+                // Handle error while submitting feedback
+            });
+        }
+    </script>
+</body>
+</html>

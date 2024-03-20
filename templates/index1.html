@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <title>Dorm Recommendation System</title>
+   
+    <link rel="icon" href="{{ url_for('static', filename='logo.ico') }}" type="image/x-icon">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+    <link href="css/bootstrap.min.css" rel="stylesheet">   
+    <link href="//fonts.googleapis.com/css?family=Oswald:300,400,700" rel="stylesheet">
+    <link href="//fonts.googleapis.com/css?family=Federo" rel="stylesheet">
+    <link href="//fonts.googleapis.com/css?family=Lato:300,400,700,900" rel="stylesheet">
+    <!-- Include jQuery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+<body>
+
+    <div class="container">
+        <div class="form-container">
+            <h1>Dorm Recommendation System</h1>
+            <img src="{{ url_for('static', filename='aicslogo.png') }}" alt="Logo" class="logo">
+
+           
+            <form action="/get_recommendations" method="post">
+                <div class="mb-3">
+                    <label for="budget" class="form-label">Budget (PHP)</label>
+                    <input type="number" class="form-control" id="budget" name="budget" min="500" max="999999" required>
+                </div>
+                <div class="mb-3">
+                    <label for="location" class="form-label">Location</label>
+                    <select class="form-select" id="location" name="location" required>
+                        <option value="" disabled selected>Select Location</option>
+                        <option value="taguig">Taguig</option>
+                        <option value="paranaque">Paranaque</option>
+                    </select>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="room_size" class="form-label">Room Size</label>
+                        <select class="form-select" id="room_size" name="room_size" required>
+                            <option value="" disabled selected>Select Room Size</option>
+                            <option value="single">Single</option>
+                            <option value="double">Double</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="bathroom" class="form-label">Bathroom Preference</label>
+                        <select class="form-select" id="bathroom" name="bathroom" required>
+                            <option value="" disabled selected>Select Bathroom Preference</option>
+                            <option value="shared">Shared</option>
+                            <option value="private">Private</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label for="environment" class="form-label">Environment Preference</label>
+                    <select class="form-select" id="environment" name="environment" required>
+                        <option value="" disabled selected>Select Environment Preference</option>
+                        <option value="social">Social</option>
+                        <option value="quiet">Quiet</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="barangay" class="form-label">Barangay</label>
+                    <select class="form-select" id="barangay" name="barangay" required disabled>
+                        <option value="" disabled selected>Select Barangay</option>
+                    </select>
+                </div>
+        
+                <input type="submit" value="Get Recommendations">
+            </form>
+
+        
+    
+            </div>
+
+        </div>
+    </div>
+
+    <script src="js/bootstrap.bundle.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('#location').change(function() {
+                var location = $(this).val();
+                var barangays = location === 'taguig' ? ['Bagumbayan', 'Bambang', 'Calzada', '...'] : ['Don Bosco', 'Baclaran', 'B F Homes', '...'];
+                var barangaySelect = $('#barangay');
+                barangaySelect.empty().append('<option value="" disabled selected>Select Barangay</option>');
+                $.each(barangays, function(index, value) {
+                    barangaySelect.append($('<option></option>').attr('value', value).text(value));
+                });
+                barangaySelect.prop('disabled', false);
+            });
+
+            $('#dormForm').submit(function(event) {
+                event.preventDefault();
+                var formData = $(this).serializeArray();
+                $.ajax({
+                    type: 'POST',
+                    url: '/get_recommendations',
+                    data: formData,
+                    success: function(response) {
+                        $('#mostRecommendedDorm').html(response.most_recommended_dorm ? response.most_recommended_dorm.name + " - Rating: " + response.most_recommended_dorm.rating : "No most recommended dorm available.");
+                        $('#previousRecommendations').empty();
+                        if (response.dorm_data) {
+                            $.each(response.dorm_data, function(index, data) {
+                                $('#previousRecommendations').append('<p>' + data.dorm + ' - Barangay: ' + data.barangay + '</p>');
+                            });
+                        }
+                        $('#recommendations').show();
+                        $('html, body').animate({
+                            scrollTop: $('#recommendations').offset().top
+                        }, 'slow');
+                    },
+                    error: function(xhr, status, error) {
+                        console.error(xhr.responseText);
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
